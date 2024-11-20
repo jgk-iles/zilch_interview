@@ -6,54 +6,74 @@ from sklearn.impute import SimpleImputer
 import numpy as np
 
 
+DROP_COLS = [
+    "customer_id",
+    "month",
+    "name",
+    "address",
+    "email",
+    "national_insurance_number",
+    "num_of_loan",
+    "credit_utilization_ratio_2",
+    "credit_utilization_ratio_3",
+    "credit_score_target"
+]
+
+REMOVE_OUTLIER_FEATURES = [
+    "age",
+    "annual_income",
+    "monthly_inhand_salary",
+    "num_bank_accounts",
+    "num_credit_card",
+    "interest_rate",
+    "delay_from_due_date",
+    "num_of_delayed_payment",
+    "changed_credit_limit",
+    "num_credit_inquiries",
+    "outstanding_debt",
+    "credit_utilization_ratio",
+    "total_emi_per_month",
+    "amount_invested_monthly",
+    "monthly_balance"
+]
+
+LOAN_TYPES = [
+    "Not Specified",
+    "Credit-Builder Loan",
+    "Personal Loan",
+    "Debt Consolidation Loan",
+    "Student Loan",
+    "Payday Loan",
+    "Mortgage Loan",
+    "Auto Loan",
+    "Home Equity Loan"
+]
+
+
 class DataCleaner(BaseEstimator, TransformerMixin):
     def __init__(
             self,
-            drop_cols: List = [
-                "customer_id",
-                "month",
-                "name",
-                "address",
-                "email",
-                "national_insurance_number",
-                "num_of_loan",
-                "credit_utilization_ratio_2",
-                "credit_utilization_ratio_3",
-                "credit_score_target"
-            ],
-            remove_outlier_features: List = [
-                "age",
-                "annual_income",
-                "monthly_inhand_salary",
-                "num_bank_accounts",
-                "num_credit_card",
-                "interest_rate",
-                "delay_from_due_date",
-                "num_of_delayed_payment",
-                "changed_credit_limit",
-                "num_credit_inquiries",
-                "outstanding_debt",
-                "credit_utilization_ratio",
-                "total_emi_per_month",
-                "amount_invested_monthly",
-                "monthly_balance"
-            ],
+            drop_cols: List = None,
+            remove_outlier_features: List = None,
             remove_outlier_factor: float = 2.5,
-            loan_types: List = [
-                "Not Specified",
-                "Credit-Builder Loan",
-                "Personal Loan",
-                "Debt Consolidation Loan",
-                "Student Loan",
-                "Payday Loan",
-                "Mortgage Loan",
-                "Auto Loan",
-                "Home Equity Loan"
-            ]):
-        self.remove_outlier_features = remove_outlier_features
+            loan_types: List = None
+    ):
+        if drop_cols is None:
+            self.drop_cols = DROP_COLS
+        else:
+            self.drop_cols = drop_cols
+
+        if remove_outlier_features is None:
+            self.remove_outlier_features = REMOVE_OUTLIER_FEATURES
+        else:
+            self.remove_outlier_features = remove_outlier_features
+
+        if loan_types is None:
+            self.loan_types = LOAN_TYPES
+        else:
+            self.loan_types = loan_types
+
         self.remove_outlier_factor = remove_outlier_factor
-        self.drop_cols = drop_cols
-        self.loan_types = loan_types
 
     def fit(self, X, y=None):
         return self
@@ -72,8 +92,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         X["credit_history_age"] = X["credit_history_age"].apply(self.parse_credit_history_age)
 
         # Remove garbage values from the payment_behaviour column
-        garbage_remover = SimpleImputer(missing_values="!@9#%8", strategy="constant", fill_value=None)
-        X["payment_behaviour"] = garbage_remover.fit_transform(X[["payment_behaviour"]]).flatten()
+        X["payment_behaviour"] = X["payment_behaviour"].replace("!@9#%8", None)
 
         # Type of loan transformer
         X[self.loan_types] = self.loan_type_counter(X[["type_of_loan"]])
