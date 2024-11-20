@@ -3,6 +3,8 @@ from typing import List
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.impute import SimpleImputer
 
+import numpy as np
+
 
 class DataCleaner(BaseEstimator, TransformerMixin):
     def __init__(
@@ -77,6 +79,9 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         X[self.loan_types] = self.loan_type_counter(X[["type_of_loan"]])
         X = X.drop(columns=["type_of_loan"])
 
+        # Remove underscores from changed_credit_limit
+        X["changed_credit_limit"] = X["changed_credit_limit"].replace('_', np.nan).astype(float)
+
         # Remove outliers from the remaining columns
         for feature in self.remove_outlier_features:
             X[feature] = self.remove_outliers(X[feature])
@@ -98,7 +103,6 @@ class DataCleaner(BaseEstimator, TransformerMixin):
     def loan_type_counter(self, X):
         X = X.copy()
         X = X.fillna("")
-        print(X)
         for loan_type in self.loan_types:
             X[loan_type] = X["type_of_loan"].apply(lambda x: x.count(loan_type))
         X = X.drop(columns=["type_of_loan"])
