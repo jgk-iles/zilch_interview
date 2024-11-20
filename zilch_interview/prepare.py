@@ -1,9 +1,12 @@
 # Define a custom transformer to handle the whole data cleaning process
 from typing import List
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.impute import SimpleImputer
 
+import argparse
+import yaml
+import os
 import numpy as np
+import pandas as pd
 
 
 DROP_COLS = [
@@ -80,7 +83,8 @@ class DataCleaner(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = X.copy()
-        X = X.drop(columns=self.drop_cols)
+        
+        X = X.drop(columns=[col for col in self.drop_cols if col in X.columns])
 
         # Strip underscores from the age column
         X["age"] = X["age"].apply(lambda x: x.strip("_")).astype(int)
@@ -148,3 +152,38 @@ class DataCleaner(BaseEstimator, TransformerMixin):
             return 0
 
         return years * 12 + months
+
+
+def main():
+    # Read input arguments from the command line
+    parser = argparse.ArgumentParser(description="Data cleaning pipeline step")
+    parser.add_argument("--train_data", type=str, help="Path to the training data")
+    parser.add_argument("--test_data", type=str, help="Path to the test data")
+    parser.add_argument("--validation_data", type=str, help="Path to the validation data")
+    parser.add_argument("--remove_outlier_factor", type=float, help="Factor to remove outliers")
+    args = parser.parse_args()
+
+    # Load the data
+    train_data = pd.read_csv(args.train_data)
+    test_data = pd.read_csv(args.test_data)
+    validation_data = pd.read_csv(args.validation_data)
+
+    # Initialize the run custom transformer
+    data_cleaner = DataCleaner(remove_outlier_factor=args.remove_outlier_factor)
+    X_train, y_train = data_cleaner.fit_transform(train_data), train_data["credit_score_target"]
+    X_test, y_test = data_cleaner.fit_transform(test_data), test_data["credit_score_target"]
+    X_validation = data_cleaner.fit_transform(validation_data)
+
+    # Combine and save the transformed data
+    train_tf = pd.concat([X_train, y_train], axis=1)
+    test_tf = pd.concat([X_test, y_test], axis=1)
+
+    os.makedirs(os.path.join("data", "cleaned"), exist_ok=True)
+    train_tf.to_csv("data/cleaned/train.csv", index=False)
+    test_tf.to_csv("data/cleaned/test.csv", index=False)
+    X_validation.to_csv("data/cleaned/validation.csv", index=False)
+
+
+# Set up DVC pipeline step
+if __name__ == "__main__":
+    main()

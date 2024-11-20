@@ -1,0 +1,2 @@
+prepare:
+  remove_outlier_factor: 2.5

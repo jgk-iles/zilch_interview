@@ -1,0 +1,11 @@
+stages:
+  prepare:
+    cmd: python -m zilch_interview.prepare --train_data data/external/train.csv --test_data data/external/test.csv --validation_data data/external/validation.csv --remove_outlier_factor ${prepare.remove_outlier_factor}
+    deps:
+      - data/external/train.csv
+      - data/external/test.csv
+      - data/external/validation.csv
+    outs:
+      - data/cleaned/train.csv
+      - data/cleaned/test.csv
+      - data/cleaned/validation.csv

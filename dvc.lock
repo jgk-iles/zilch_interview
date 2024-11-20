@@ -1,0 +1,32 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python -m zilch_interview.prepare --train_data data/external/train.csv --test_data
+      data/external/test.csv --validation_data data/external/validation.csv --remove_outlier_factor
+      2.5
+    deps:
+    - path: data/external/test.csv
+      hash: md5
+      md5: 3c3b732aec9d30eef36f7280bc8848ec
+      size: 11864995
+    - path: data/external/train.csv
+      hash: md5
+      md5: c64a31ebcfb3c76b7645a67aaf2f2e98
+      size: 46909142
+    - path: data/external/validation.csv
+      hash: md5
+      md5: 814c42dccfe0a7b317ee19e90ce310e1
+      size: 11700912
+    outs:
+    - path: data/cleaned/test.csv
+      hash: md5
+      md5: 7cc9382ee7d06b25d9e47ee54b92b3af
+      size: 5162150
+    - path: data/cleaned/train.csv
+      hash: md5
+      md5: a7c203bd768a628033e228b8dfc42d70
+      size: 20551201
+    - path: data/cleaned/validation.csv
+      hash: md5
+      md5: 5fb7268e54fc76f1af0ecf6a105f8490
+      size: 5009874
