@@ -1,0 +1,6 @@
+outs:
+- md5: db49cd20642805dd34bc67d418e6863a.dir
+  size: 70475049
+  nfiles: 3
+  hash: md5
+  path: external
