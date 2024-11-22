@@ -1,11 +1,36 @@
 stages:
   prepare:
-    cmd: python -m zilch_interview.prepare --train_data data/external/train.csv --test_data data/external/test.csv --validation_data data/external/validation.csv --remove_outlier_factor ${prepare.remove_outlier_factor}
+    cmd: python -m zilch_interview.prepare --train_data data/external/train.csv --test_data
+      data/external/test.csv --validation_data data/external/validation.csv --remove_outlier_factor
+      ${prepare.remove_outlier_factor}
     deps:
-      - data/external/train.csv
-      - data/external/test.csv
-      - data/external/validation.csv
+    - data/external/train.csv
+    - data/external/test.csv
+    - data/external/validation.csv
+    - zilch_interview/prepare.py
     outs:
-      - data/cleaned/train.csv
-      - data/cleaned/test.csv
-      - data/cleaned/validation.csv
+    - data/cleaned/train.pkl
+    - data/cleaned/test.pkl
+    - data/cleaned/validation.pkl
+    params:
+    - prepare.remove_outlier_factor
+  train:
+    cmd: python -m zilch_interview.train --train_data data/cleaned/train.pkl
+    deps:
+    - data/cleaned/train.pkl
+    - zilch_interview/train.py
+    outs:
+    - models/catboost_model.pkl
+    params:
+    - train.model
+    - train.model_params
+  evaluate:
+    cmd: python -m zilch_interview.evaluate --model models/catboost_model.pkl --train_data
+      data/cleaned/train.pkl --test_data data/cleaned/test.pkl
+    deps:
+    - models/catboost_model.pkl
+    - data/cleaned/train.pkl
+    - data/cleaned/test.pkl
+    - zilch_interview/evaluate.py
+metrics:
+- evaluation/metrics.json

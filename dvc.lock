@@ -17,16 +17,69 @@ stages:
       hash: md5
       md5: 814c42dccfe0a7b317ee19e90ce310e1
       size: 11700912
+    - path: zilch_interview/prepare.py
+      hash: md5
+      md5: 0fb3a1852997a84c0d54b5ceff8b0c22
+      size: 5881
+    params:
+      params.yaml:
+        prepare.remove_outlier_factor: 2.5
     outs:
-    - path: data/cleaned/test.csv
+    - path: data/cleaned/test.pkl
       hash: md5
-      md5: 7cc9382ee7d06b25d9e47ee54b92b3af
-      size: 5162150
-    - path: data/cleaned/train.csv
+      md5: ac5968d1fce294695a4dcf0ebbefb49b
+      size: 5352238
+    - path: data/cleaned/train.pkl
       hash: md5
-      md5: a7c203bd768a628033e228b8dfc42d70
-      size: 20551201
-    - path: data/cleaned/validation.csv
+      md5: 3f0e060a1df383595e32b8d73dbbd087
+      size: 21403793
+    - path: data/cleaned/validation.pkl
       hash: md5
-      md5: 5fb7268e54fc76f1af0ecf6a105f8490
-      size: 5009874
+      md5: 8c16d119e98b73577c6aa99e306e166c
+      size: 5153311
+  train:
+    cmd: python -m zilch_interview.train --train_data data/cleaned/train.pkl
+    deps:
+    - path: data/cleaned/train.pkl
+      hash: md5
+      md5: 3f0e060a1df383595e32b8d73dbbd087
+      size: 21403793
+    - path: zilch_interview/train.py
+      hash: md5
+      md5: 5b0105f89cc11747becaea8a05ff772a
+      size: 2063
+    params:
+      params.yaml:
+        train.model: CatBoostRegressor
+        train.model_params:
+          learning_rate: 0.1
+          iterations: 1000
+          depth: 6
+          l2_leaf_reg: 3
+          border_count: 254
+          random_seed: 42
+    outs:
+    - path: models/catboost_model.pkl
+      hash: md5
+      md5: b9bcd7ad65d134b67d955451e0a4e4ed
+      size: 1122460
+  evaluate:
+    cmd: python -m zilch_interview.evaluate --model models/catboost_model.pkl --train_data
+      data/cleaned/train.pkl --test_data data/cleaned/test.pkl
+    deps:
+    - path: data/cleaned/test.pkl
+      hash: md5
+      md5: ac5968d1fce294695a4dcf0ebbefb49b
+      size: 5352238
+    - path: data/cleaned/train.pkl
+      hash: md5
+      md5: 3f0e060a1df383595e32b8d73dbbd087
+      size: 21403793
+    - path: models/catboost_model.pkl
+      hash: md5
+      md5: b9bcd7ad65d134b67d955451e0a4e4ed
+      size: 1122460
+    - path: zilch_interview/evaluate.py
+      hash: md5
+      md5: b8c9adb9df5d7554b478e0ab422fbbe6
+      size: 1614

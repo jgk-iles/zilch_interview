@@ -3,7 +3,6 @@ from typing import List
 from sklearn.base import BaseEstimator, TransformerMixin
 
 import argparse
-import yaml
 import os
 import numpy as np
 import pandas as pd
@@ -83,7 +82,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = X.copy()
-        
+
         X = X.drop(columns=[col for col in self.drop_cols if col in X.columns])
 
         # Strip underscores from the age column
@@ -96,7 +95,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         X["credit_history_age"] = X["credit_history_age"].apply(self.parse_credit_history_age)
 
         # Remove garbage values from the payment_behaviour column
-        X["payment_behaviour"] = X["payment_behaviour"].replace("!@9#%8", None)
+        X["payment_behaviour"] = X["payment_behaviour"].replace("!@9#%8", "Unknown")
 
         # Type of loan transformer
         X[self.loan_types] = self.loan_type_counter(X[["type_of_loan"]])
@@ -179,9 +178,9 @@ def main():
     test_tf = pd.concat([X_test, y_test], axis=1)
 
     os.makedirs(os.path.join("data", "cleaned"), exist_ok=True)
-    train_tf.to_csv("data/cleaned/train.csv", index=False)
-    test_tf.to_csv("data/cleaned/test.csv", index=False)
-    X_validation.to_csv("data/cleaned/validation.csv", index=False)
+    train_tf.to_pickle("data/cleaned/train.pkl")
+    test_tf.to_pickle("data/cleaned/test.pkl")
+    X_validation.to_pickle("data/cleaned/validation.pkl")
 
 
 # Set up DVC pipeline step

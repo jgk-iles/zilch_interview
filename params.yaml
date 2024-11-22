@@ -1,2 +1,11 @@
 prepare:
   remove_outlier_factor: 2.5
+train:
+  model: CatBoostRegressor
+  model_params:
+    learning_rate: 0.1
+    iterations: 1000
+    depth: 6
+    l2_leaf_reg: 3
+    border_count: 254
+    random_seed: 42
