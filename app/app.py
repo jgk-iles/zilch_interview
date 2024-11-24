@@ -7,9 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Add models directory to path
-root_dir = Path(__file__).resolve().parent.parent
-model_dir = root_dir / 'models/'
-data_dir = root_dir / 'data/'
+app_dir = Path(__file__).resolve().parent
+model_dir = app_dir / 'models/'
+data_dir = app_dir / 'data/'
 
 
 def load_model():
@@ -23,11 +23,11 @@ def load_model():
 def load_customers(dataset="train"):
     """Load the customers dataset."""
     if dataset == "train":
-        data_path = data_dir / 'scored' / 'train.pkl'
+        data_path = data_dir / 'train.pkl'
     elif dataset == "test":
-        data_path = data_dir / 'scored' / 'test.pkl'
+        data_path = data_dir / 'test.pkl'
     elif dataset == "validation":
-        data_path = data_dir / 'scored' / 'validation.pkl'
+        data_path = data_dir / 'validation.pkl'
     else:
         raise ValueError("Invalid dataset. Must be one of 'train', 'test', or 'validation'.")
     return pd.read_pickle(data_path)
