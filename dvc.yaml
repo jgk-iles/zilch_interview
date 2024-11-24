@@ -26,11 +26,15 @@ stages:
     - train.model_params
   evaluate:
     cmd: python -m zilch_interview.evaluate --model models/catboost_model.pkl --train_data
-      data/cleaned/train.pkl --test_data data/cleaned/test.pkl
+      data/cleaned/train.pkl --test_data data/cleaned/test.pkl --validation_data data/cleaned/validation.pkl
     deps:
     - models/catboost_model.pkl
     - data/cleaned/train.pkl
     - data/cleaned/test.pkl
     - zilch_interview/evaluate.py
+    outs:
+    - data/scored/train.pkl
+    - data/scored/test.pkl
+    - data/scored/validation.pkl
 metrics:
 - evaluation/metrics.json

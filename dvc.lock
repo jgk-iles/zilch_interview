@@ -65,7 +65,7 @@ stages:
       size: 1122460
   evaluate:
     cmd: python -m zilch_interview.evaluate --model models/catboost_model.pkl --train_data
-      data/cleaned/train.pkl --test_data data/cleaned/test.pkl
+      data/cleaned/train.pkl --test_data data/cleaned/test.pkl --validation_data data/cleaned/validation.pkl
     deps:
     - path: data/cleaned/test.pkl
       hash: md5
@@ -81,5 +81,18 @@ stages:
       size: 1122460
     - path: zilch_interview/evaluate.py
       hash: md5
-      md5: b8c9adb9df5d7554b478e0ab422fbbe6
-      size: 1614
+      md5: 3eb6a08b7b0771d17fbab2756339a6ff
+      size: 3198
+    outs:
+    - path: data/scored/test.pkl
+      hash: md5
+      md5: 75f8019c9673189698099fd356ac6989
+      size: 6752591
+    - path: data/scored/train.pkl
+      hash: md5
+      md5: 1b370fd0f6dbe668aef2a5a9197f3795
+      size: 27004577
+    - path: data/scored/validation.pkl
+      hash: md5
+      md5: df44ce8f5acb95b2fc77f5181d8b42a9
+      size: 6552493
